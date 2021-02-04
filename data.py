@@ -53,10 +53,10 @@ def add_user_list(user):
 
 def get_viewed_user(user_id, users_list):
     list = session.query(FoundUser).filter(FoundUser.User_id == user_id).all()
-    users = []
+    users = set()
     found_users = []
     for item in list:
-        users.append(item.vk_id)
+        users.add(item.vk_id)
     for item in users_list:
         if item['id'] not in users:
             found_users.append(item)
