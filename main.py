@@ -116,13 +116,16 @@ class VkBot:
                     'https://api.vk.com/method/database.getCities',
                     get_params({'country_id': 1, 'count': 1, 'q': new_event.message})
                 )
-                if not response.json()['response']['items']:
+                resp = response.json()
+                items = resp.get('response', {}).get('items', [])
+                if not items:
                     write_msg(self.user_id, UNKNOWN_TOWN_MESSAGE)
                     return self.get_city()
                 else:
-                    for city_id in response.json()['response']['items']:
+                    for city_id in items:
                         self.city = city_id['id']
                         return self.city
+
 
     #
     # минимальный возраст
@@ -170,25 +173,32 @@ class VkBot:
                         'has_photo': 1}
                        )
         )
-        if response.json()['response']['items']:
-            for users_id in response.json()['response']['items']:
-                private = users_id['is_closed']
-                if private:
-                    pass
-                else:
-                    users_list.append(users_id)
-            self.users_list = data.get_viewed_user(self.user.id, users_list)
-            return self.users_list
+        resp = response.json()
+        items = resp.get('response', {}).get('items', [])
+        if not items:
+            return None
+        for users_id in items:
+            private = users_id['is_closed']
+            if private:
+                pass
+            else:
+                users_list.append(users_id)
+        self.users_list = data.get_viewed_user(self.user.id, users_list)
+        return self.users_list
 
     def get_json(self, result):
         res = list()
         for i in result:
-
+            photos = i.top_photos.split(',')
+            photos_list = []
+            for item in photos:
+                photos_list.append(f'https://vk.com/{item}')
             d = {
-                'id':f'vk.com/id{i.vk_id}',
+                'id':f'https://vk.com/id{i.vk_id}',
                 'first_name': i.first_name,
                 'last_name': i.last_name,
-                'photos': i.top_photos
+                'photos': photos_list
+
             }
             res.append(d)
             if len(res) > 9:

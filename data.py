@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 
 Base = declarative_base()
-engine = sq.create_engine('Введите путь к базе данных')
+engine = sq.create_engine('Введите путь к базе')
 Session = sessionmaker(bind=engine)
 session = Session()
 
