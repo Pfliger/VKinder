@@ -52,7 +52,11 @@ class VkBot:
             'https://api.vk.com/method/users.get',
             get_params({'user_ids': self.user_id})
         )
-        for user_info in response.json()['response']:
+        resp = response.json()
+        items = resp.get('response', {})
+        if not items:
+            return None
+        for user_info in items :
             self.first_name = user_info['first_name']
             self.last_name = user_info['last_name']
         return self.first_name, self.last_name
@@ -228,7 +232,11 @@ class FoundUser(VkBot):
                         'count': 1000}
                        )
         )
-        sorted_response = sorted(response.json()['response']['items'],
+        resp = response.json()
+        items = resp.get('response', {}).get('items', [])
+        if not items:
+            return None
+        sorted_response = sorted(items,
                                  key=lambda x: x['likes']['count'], reverse=True)
         for photo_id in sorted_response:
             photos.append(f'''photo{id}_{photo_id['id']}''')
